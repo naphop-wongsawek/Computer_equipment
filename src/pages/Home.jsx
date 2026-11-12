@@ -1,9 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import FeaturedCarousel from '../components/FeaturedCarousel';
-import { movies as localMovies } from '../data/data';
+import { getProducts } from '../api/backend';
 
-// สลับลำดับแบบสุ่มบนสำเนา ไม่แตะ array เดิม
 function shuffle(list) {
   const copy = [...list];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -14,40 +13,92 @@ function shuffle(list) {
 }
 
 function Home() {
-  // สุ่มครั้งเดียวตอน component เกิด แล้วจำไว้ใน state (กดเลื่อนแล้วลำดับไม่เปลี่ยน)
-  const [picks, setPicks] = useState(() => shuffle(localMovies));
+  const [products, setProducts] = useState([]);
+  const [picks, setPicks] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let ignore = false;
+    getProducts()
+      .then(items => {
+        if (ignore) return;
+        setProducts(items);
+        setPicks(shuffle(items));
+      })
+      .catch(loadError => {
+        if (!ignore) setError(loadError);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const categories = [...new Set(products.map(product => product.category).filter(Boolean))];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 md:px-6">
-      {/* Hero */}
-      <section className="py-14 md:py-20">
-        <p className="text-sm font-medium text-emerald-600">รีวิวอุปกรณ์คอมพิวเตอร์</p>
-        <h1 className="mt-2 max-w-2xl text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl">
-          เลือกอุปกรณ์ให้ถูกใจ จากรีวิวจริง
-        </h1>
-        <p className="mt-4 max-w-xl text-slate-600">
-          รวมรีวิวการ์ดจอ ซีพียู เมาส์ คีย์บอร์ด จอมอนิเตอร์ หูฟัง และอุปกรณ์อื่นๆ
-          ดูรายละเอียดและอ่านความเห็นจากสมาชิกก่อนตัดสินใจซื้อ
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link to="/products" className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600">
-            ดูอุปกรณ์ทั้งหมด
-          </Link>
+    <div className="bg-[#faf7ef]">
+      <section className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
+        <div className="rounded-3xl border border-emerald-200 bg-white/70 p-5 shadow-sm md:p-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">ค้นหาตามการใช้งาน</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                เริ่มจากหมวดที่คุณสนใจ
+              </h2>
+              <p className="mt-2 text-sm text-slate-500">เลือกดูอุปกรณ์แต่ละประเภทได้ในที่เดียว</p>
+            </div>
+            <Link to="/products" className="text-sm font-semibold text-emerald-800 hover:text-emerald-600">
+              ดูสินค้าทั้งหมด <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+
+          {categories.length > 0 ? (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {categories.map((category, index) => (
+                <Link
+                  key={category}
+                  to={`/products?category=${encodeURIComponent(category)}`}
+                  className="group inline-flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-100"
+                >
+                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-white text-lg shadow-sm">
+                    {['▦', '⌘', '◉', '⌨', '▣', '◌'][index % 6]}
+                  </span>
+                  <span>{category}</span>
+                  <span className="text-emerald-700 transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-6 h-16 animate-pulse rounded-xl bg-emerald-50" />
+          )}
         </div>
       </section>
 
-      {/* Featured */}
-      <section className="pb-16">
-        <div className="mb-4 flex items-end justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-900">อุปกรณ์แนะนำ</h2>
-            <p className="text-sm text-slate-500">สุ่มลำดับใหม่ทุกครั้งที่เปิดหน้า</p>
+      <section className="bg-[#faf7ef]">
+        <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Community picks</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">อุปกรณ์แนะนำ</h2>
+              <p className="mt-2 text-sm text-slate-500">สำรวจตัวเลือกน่าสนใจจากแคตตาล็อกของเรา</p>
+            </div>
+            <button
+              onClick={() => setPicks(current => shuffle(current))}
+              disabled={picks.length < 2}
+              className="shrink-0 rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-400 hover:bg-emerald-50 disabled:opacity-50"
+            >
+              สุ่มใหม่ <span aria-hidden="true">⟳</span>
+            </button>
           </div>
-          <button onClick={() => setPicks(shuffle(picks))} className="text-sm text-emerald-600 hover:underline">
-            สุ่มใหม่
-          </button>
+          {error ? (
+            <p role="alert" className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
+              โหลดอุปกรณ์แนะนำไม่สำเร็จ: {error.message}
+            </p>
+          ) : (
+            <FeaturedCarousel products={picks} />
+          )}
         </div>
-        <FeaturedCarousel movies={picks} />
       </section>
     </div>
   );

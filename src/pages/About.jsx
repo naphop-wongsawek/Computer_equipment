@@ -15,8 +15,8 @@ function About() {
 
       <h2 className="mt-8 font-medium text-slate-900">ทีมผู้จัดทำ</h2>
       <ul className="mt-2 list-disc pl-5 text-slate-700">
-        <li>ชื่อ นามสกุล (รหัสนักศึกษา)</li>
-        <li>ชื่อ นามสกุล (รหัสนักศึกษา)</li>
+        <li>ณภพ วงษ์เสวก 670710717</li>
+        <li>กิตตินันท์ อินทร์ตามา 670710312</li>
       </ul>
     </div>
   );

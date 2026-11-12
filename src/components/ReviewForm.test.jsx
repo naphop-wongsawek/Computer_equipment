@@ -3,32 +3,69 @@ import userEvent from '@testing-library/user-event';
 import ReviewForm from './ReviewForm';
 
 test('ยังไม่พิมพ์อะไร ปุ่มส่งต้องกดไม่ได้', () => {
-  render(<ReviewForm movieTitle="Parasite" onSubmit={jest.fn()} />);
+  render(
+    <ReviewForm productTitle="GeForce RTX 4060" onSubmit={jest.fn()} />
+  );
 
-  expect(screen.getByRole('button', { name: 'ส่งรีวิว' })).toBeDisabled();
+  expect(
+    screen.getByRole('button', { name: 'ส่งรีวิว' })
+  ).toBeDisabled();
 });
 
-test('พิมพ์แล้วกดส่ง ต้องเรียก onSubmit ด้วยข้อความที่พิมพ์ แล้วขึ้นข้อความขอบคุณ', async () => {
+test('พิมพ์แล้วกดส่ง ต้องเรียก onSubmit และแสดงข้อความขอบคุณ', async () => {
   const user = userEvent.setup();
-  const onSubmit = jest.fn().mockResolvedValue();          // แม่ปลอม: รับแล้วบอกว่าสำเร็จ
-  render(<ReviewForm movieTitle="Parasite" onSubmit={onSubmit} />);
+  const onSubmit = jest.fn().mockResolvedValue();
 
-  await user.type(screen.getByPlaceholderText(/ดูแล้วรู้สึกอย่างไร/), 'สนุกมาก ฉากแอ็กชันดี');
-  await user.click(screen.getByRole('button', { name: 'ส่งรีวิว' }));
+  render(
+    <ReviewForm productTitle="GeForce RTX 4060" onSubmit={onSubmit} />
+  );
 
-  expect(onSubmit).toHaveBeenCalledWith('สนุกมาก ฉากแอ็กชันดี');
-  expect(await screen.findByText(/ขอบคุณสำหรับรีวิว Parasite/)).toBeInTheDocument();
+  await user.type(
+    screen.getByPlaceholderText(/ใช้งานแล้วรู้สึกอย่างไร/),
+    'ใช้งานได้ดีมาก ประสิทธิภาพคุ้มราคา'
+  );
+
+  await user.click(
+    screen.getByRole('button', { name: 'ส่งรีวิว' })
+  );
+
+  expect(onSubmit).toHaveBeenCalledWith(
+    'ใช้งานได้ดีมาก ประสิทธิภาพคุ้มราคา'
+  );
+
+  expect(
+    await screen.findByText(/ขอบคุณสำหรับรีวิว GeForce RTX 4060/)
+  ).toBeInTheDocument();
 });
 
-test('ถ้า onSubmit โยน Error ต้องโชว์ข้อความนั้น และฟอร์มยังอยู่ให้แก้ต่อ', async () => {
+test('ถ้า onSubmit โยน Error ต้องแสดงข้อความและฟอร์มยังอยู่', async () => {
   const user = userEvent.setup();
-  const onSubmit = jest.fn().mockRejectedValue(new Error('รีวิวสั้นเกินไป'));   // แม่ปลอม: server ตอบ 400
-  render(<ReviewForm movieTitle="Parasite" onSubmit={onSubmit} />);
+  const onSubmit = jest.fn().mockRejectedValue(
+    new Error('รีวิวสั้นเกินไป')
+  );
 
-  await user.type(screen.getByPlaceholderText(/ดูแล้วรู้สึกอย่างไร/), 'สั้นไป');
-  await user.click(screen.getByRole('button', { name: 'ส่งรีวิว' }));
+  render(
+    <ReviewForm productTitle="GeForce RTX 4060" onSubmit={onSubmit} />
+  );
 
-  expect(await screen.findByText('รีวิวสั้นเกินไป')).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'ส่งรีวิว' })).toBeInTheDocument();   // ไม่ได้ไปหน้าขอบคุณ
-  expect(screen.queryByText(/ขอบคุณสำหรับรีวิว/)).not.toBeInTheDocument();
+  await user.type(
+    screen.getByPlaceholderText(/ใช้งานแล้วรู้สึกอย่างไร/),
+    'สั้นไป'
+  );
+
+  await user.click(
+    screen.getByRole('button', { name: 'ส่งรีวิว' })
+  );
+
+  expect(
+    await screen.findByText('รีวิวสั้นเกินไป')
+  ).toBeInTheDocument();
+
+  expect(
+    screen.getByRole('button', { name: 'ส่งรีวิว' })
+  ).toBeInTheDocument();
+
+  expect(
+    screen.queryByText(/ขอบคุณสำหรับรีวิว/)
+  ).not.toBeInTheDocument();
 });

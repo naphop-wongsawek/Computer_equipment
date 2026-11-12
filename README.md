@@ -1,59 +1,65 @@
-# 💻 TechReview
+# TechReview
 
-เว็บรีวิวอุปกรณ์คอมพิวเตอร์ รวมรีวิวการ์ดจอ ซีพียู เมาส์ คีย์บอร์ด จอมอนิเตอร์ หูฟัง SSD และแรม
-สมาชิกเข้าสู่ระบบเพื่อเขียนรีวิวและบันทึกอุปกรณ์ที่อยากได้
+เว็บรีวิวอุปกรณ์คอมพิวเตอร์ สมาชิกเข้าสู่ระบบเพื่อเขียนรีวิว ให้คะแนน และบันทึกอุปกรณ์ที่สนใจ
 
-สร้างด้วย React 19 + React Router 6 + Tailwind CSS 3
-
-## ฟีเจอร์
-
-- ดูรายการอุปกรณ์ทั้งหมด ค้นหาด้วยชื่อรุ่นหรือยี่ห้อ และกรองตามหมวด
-- หน้ารายละเอียดอุปกรณ์ พร้อมคะแนน ราคาโดยประมาณ และรีวิวจากสมาชิก
-- เข้าสู่ระบบเพื่อเขียนรีวิวและบันทึกรายการอยากได้
-- หน้าแรกแสดงอุปกรณ์แนะนำแบบสุ่ม
+สร้างด้วย React 19, React Router 6 และ Tailwind CSS 3 โดยใช้ API contract เดียวกับ Go backend ในไฟล์อ้างอิง
 
 ## เริ่มใช้งาน
 
-```
+ติดตั้ง dependencies:
+
+```bash
 npm install
-cp .env.example .env      # เปิด .env แล้วตั้งค่าตามที่ระบุในไฟล์
+```
+
+เปิด backend จำลองใน terminal แรก:
+
+```bash
+npm run mock
+```
+
+เปิดเว็บใน terminal ที่สอง:
+
+```bash
 npm start
 ```
 
-หากแก้ไฟล์ `.env` ต้องหยุดแล้วรัน `npm start` ใหม่
+เมื่อ `REACT_APP_API_URL` ว่าง CRA จะ proxy `/api` ไปที่ mock บน `localhost:4000`
 
-## โครงสร้างไฟล์หลัก
+บัญชีสำหรับ mock:
 
+- สมาชิก: `demo@techreview.test` / `1234`
+- ผู้ดูแล: `admin@techreview.test` / `1234`
+
+ข้อมูล mock เก็บในหน่วยความจำ ปิด server แล้วข้อมูลที่เพิ่มระหว่างใช้งานจะหายไป
+
+## Backend จริง
+
+เมื่อตั้ง `REACT_APP_API_URL` เป็น origin ของ Go backend ใน `.env.local` หน้าเว็บระหว่างพัฒนาจะส่ง `/api` ผ่าน dev proxy เพื่อหลีกเลี่ยง CORS ใน browser ส่วน production จะเรียก API โดยตรง จึงต้องตั้งค่า origin นี้ใน Environment Variables ของ deployment เช่น:
+
+```env
+REACT_APP_API_URL=https://api.example.com
 ```
-src/
-  data/data.js             ข้อมูลอุปกรณ์ (ชื่อรุ่น ยี่ห้อ หมวด ราคา คะแนน รายละเอียด)
-  api/backend.js           ติดต่อ backend (รีวิว รายการอยากได้ การเข้าสู่ระบบ)
-  components/              Navbar, Footer, MovieCard, MovieGrid, FeaturedCarousel, ReviewForm ฯลฯ
-  pages/                   Home, Movies (รายการอุปกรณ์), MovieDetail (รายละเอียด), About ฯลฯ
-```
 
-> หมายเหตุ: ไฟล์ที่ขึ้นต้นด้วย Movie เป็นชื่อเดิมของโปรเจกต์ ปัจจุบันใช้แสดงอุปกรณ์คอมพิวเตอร์
+Go backend ต้องอนุญาต origin ของ frontend ใน `ALLOWED_ORIGINS` และทุกคำขอที่ต้อง login จะส่ง `Authorization: Bearer <token>`
 
-## การเพิ่มอุปกรณ์
+รายละเอียดตารางและ endpoint อยู่ใน [docs/db-schema.md](./docs/db-schema.md) และ [docs/api-wishlist.md](./docs/api-wishlist.md)
 
-เพิ่มรายการใหม่ใน `src/data/data.js` โดยมี field ดังนี้
+## รูปแบบข้อมูลอุปกรณ์จาก API
 
-| field | ความหมาย |
-| ----- | -------- |
-| `id` | เลขประจำรายการ (ห้ามซ้ำ) |
+รายการอุปกรณ์ใช้ field ตาม Go backend:
+
+| Field | ความหมาย |
+|---|---|
+| `id` | รหัสอุปกรณ์ |
 | `title` | ชื่อรุ่น |
 | `titleTh` | ยี่ห้อ |
-| `genre` | หมวดอุปกรณ์ เช่น การ์ดจอ, ซีพียู |
-| `year` | ปีที่เปิดตัว |
-| `rating` | คะแนนรีวิว |
+| `genre` | ชื่อหมวดภาษาไทย |
+| `year` | ปีเปิดตัว |
+| `rating` | คะแนนทีมงาน (0–10) |
 | `price` | ราคาโดยประมาณ (บาท) |
-| `emoji` | ไอคอนที่แสดงเมื่อยังไม่มีรูป |
-| `detail` | รายละเอียดและสรุปรีวิว |
-| `poster` | ลิงก์รูป (เว้นว่างได้) |
+| `emoji` | ไอคอนเมื่อไม่มีรูป |
+| `poster` | URL รูป |
+| `detail` | รายละเอียด |
 
-## Deploy ขึ้น Vercel
-
-1. push โค้ดขึ้น GitHub (ตรวจว่า `git status` ไม่มีไฟล์ `.env`)
-2. Vercel: Add New Project แล้วเลือก repo
-3. Settings > Environment Variables เพิ่มตัวแปรเหมือนใน `.env`
-4. Deploy (ถ้าเพิ่มตัวแปรทีหลังต้องกด Redeploy)
+รายละเอียดหน้ารายการยังมี `memberRating`, `memberVoteCount`, `myVote` และ `inWishlist`

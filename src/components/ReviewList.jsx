@@ -1,4 +1,4 @@
-// รายการรีวิวของหนัง 1 เรื่อง รับ items รูปร่างตามสัญญา GET /api/movies/{id}/reviews
+// รายการรีวิวอุปกรณ์ รับ items จาก GET /api/equipment/{id}/reviews
 function ReviewList({ items }) {
   if (items.length === 0) {
     return <p className="text-sm text-slate-400">ยังไม่มีรีวิว เป็นคนแรกเลย</p>;

@@ -46,7 +46,7 @@ function AdminDashboard() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-        <StatCard label="หนัง" value={stats.movies} to="/admin/movies" />
+        <StatCard label="อุปกรณ์" value={stats.equipment} to="/admin/products" />
         <StatCard label="สมาชิก" value={stats.members} to="/admin/members" />
         <StatCard label="admin" value={stats.admins} />
         <StatCard label="โหวต" value={stats.votes} />
@@ -55,7 +55,7 @@ function AdminDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <section className="rounded-xl border border-emerald-100 bg-white p-4">
-          <h2 className="font-semibold text-slate-900">หนังที่สมาชิกให้คะแนนสูงสุด</h2>
+          <h2 className="font-semibold text-slate-900">อุปกรณ์ที่สมาชิกให้คะแนนสูงสุด</h2>
           <p className="text-xs text-slate-400">คะแนนจากสมาชิกเว็บเรา ไม่ใช่ของ TMDB</p>
           {stats.topVoted.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-400">ยังไม่มีใครโหวต</p>
@@ -68,7 +68,7 @@ function AdminDashboard() {
                     ? <img src={m.poster} alt="" className="h-12 w-8 rounded object-cover" />
                     : <div className="grid h-12 w-8 place-items-center rounded bg-slate-100 text-xs">🎬</div>}
                   <div className="min-w-0 flex-1">
-                    <Link to={`/movies/${m.id}`} className="block truncate text-sm font-medium text-slate-900 hover:text-emerald-600">{m.title}</Link>
+                    <Link to={`/products/${m.id}`} className="block truncate text-sm font-medium text-slate-900 hover:text-emerald-600">{m.title}</Link>
                     {m.titleTh && <p className="truncate text-xs text-slate-500">{m.titleTh}</p>}
                   </div>
                   <span className="text-sm text-slate-600">⭐ {m.voteAverage} <span className="text-xs text-slate-400">({m.voteCount})</span></span>
