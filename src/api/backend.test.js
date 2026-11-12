@@ -1,4 +1,4 @@
-import { apiFetch, getProduct, getProducts, login, postReview } from './backend';
+import { apiFetch, getProduct, getProducts, getWishlist, login, postReview } from './backend';
 
 function fakeResponse(status, body) {
   return {
@@ -42,9 +42,16 @@ test('equipment list and detail use the Go payload fields and product adapter', 
     }))
     .mockResolvedValueOnce(fakeResponse(200, {
       id: 13,
+      memberRating: 8.5,
+      memberVoteCount: 2,
+    }))
+    .mockResolvedValueOnce(fakeResponse(200, {
+      id: 13,
       title: 'GeForce RTX 4060',
       titleTh: 'NVIDIA',
       genre: 'การ์ดจอ',
+      memberRating: 8.5,
+      memberVoteCount: 2,
       myVote: 8,
       inWishlist: true,
     }));
@@ -59,14 +66,50 @@ test('equipment list and detail use the Go payload fields and product adapter', 
     releaseYear: 2023,
     description: 'รายละเอียด',
     imageUrl: 'https://example.com/rtx.jpg',
+    memberRating: 8.5,
+    memberVoteCount: 2,
   });
   expect(detail.myVote).toBe(8);
   expect(detail.inWishlist).toBe(true);
   expect(fetch.mock.calls.map(([url]) => url)).toEqual([
     `${API_URL}/api/equipment`,
     `${API_URL}/api/equipment/13`,
+    `${API_URL}/api/equipment/13`,
   ]);
-  expect(fetch.mock.calls[1][1].headers.Authorization).toBe('Bearer abc123');
+  expect(fetch.mock.calls[1][1].headers.Authorization).toBeUndefined();
+  expect(fetch.mock.calls[2][1].headers.Authorization).toBe('Bearer abc123');
+});
+
+test('wishlist can load member ratings for products shown in its grid', async () => {
+  fetch
+    .mockResolvedValueOnce(fakeResponse(200, {
+      items: [{
+        id: 13,
+        title: 'GeForce RTX 4060',
+        titleTh: 'NVIDIA',
+        genre: 'การ์ดจอ',
+      }],
+    }))
+    .mockResolvedValueOnce(fakeResponse(200, {
+      id: 13,
+      memberRating: 9,
+      memberVoteCount: 3,
+    }));
+
+  const wishlist = await getWishlist('abc123', { includeMemberRatings: true });
+
+  expect(wishlist.items[0]).toMatchObject({
+    name: 'GeForce RTX 4060',
+    memberRating: 9,
+    memberVoteCount: 3,
+  });
+  expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+    `${API_URL}/api/me/wishlist`,
+    `${API_URL}/api/equipment/13`,
+  ]);
+  expect(fetch.mock.calls.every(([, options]) =>
+    options.headers.Authorization === 'Bearer abc123'
+  )).toBe(true);
 });
 
 test('authenticated requests use Bearer authorization and JSON bodies', async () => {

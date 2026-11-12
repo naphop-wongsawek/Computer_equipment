@@ -54,6 +54,15 @@ function getItems(data, endpoint) {
   return data.items;
 }
 
+async function addMemberRating(product, token) {
+  const details = await getProduct(product.id, token);
+  return {
+    ...product,
+    memberRating: details.memberRating,
+    memberVoteCount: details.memberVoteCount,
+  };
+}
+
 export function register(email, password, displayName) {
   return apiFetch('/api/auth/register', {
     method: 'POST',
@@ -100,9 +109,15 @@ export function deleteVote(equipmentId, token) {
   });
 }
 
-export async function getWishlist(token) {
+export async function getWishlist(token, { includeMemberRatings = false } = {}) {
   const data = await apiFetch('/api/me/wishlist', { token });
-  return { ...data, items: getItems(data, 'wishlist').map(toProduct) };
+  const items = getItems(data, 'wishlist').map(toProduct);
+  return {
+    ...data,
+    items: includeMemberRatings
+      ? await Promise.all(items.map(item => addMemberRating(item, token)))
+      : items,
+  };
 }
 
 export function addToWishlist(equipmentId, token, note) {
@@ -126,7 +141,8 @@ export async function getProducts(options = {}) {
   if (options.categoryId) params.set('category', options.categoryId);
   const query = params.toString();
   const data = await apiFetch(`/api/equipment${query ? `?${query}` : ''}`);
-  return getItems(data, 'อุปกรณ์').map(toProduct);
+  const items = getItems(data, 'อุปกรณ์').map(toProduct);
+  return Promise.all(items.map(item => addMemberRating(item)));
 }
 
 export async function getProduct(id, token) {

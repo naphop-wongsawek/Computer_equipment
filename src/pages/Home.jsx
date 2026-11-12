@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FeaturedCarousel from '../components/FeaturedCarousel';
-import { getProduct, getProducts } from '../api/backend';
+import { getProducts } from '../api/backend';
 
 function shuffle(list) {
   const copy = [...list];
@@ -24,19 +24,7 @@ function Home() {
         const items = await getProducts();
         if (ignore) return;
         setProducts(items);
-        const productsWithRatings = await Promise.all(
-          items.map(async item => {
-            const details = await getProduct(item.id);
-            return {
-              ...item,
-              memberRating: details.memberRating,
-              memberVoteCount: details.memberVoteCount,
-            };
-          })
-        );
-        if (ignore) return;
-        setProducts(productsWithRatings);
-        setPicks(shuffle(productsWithRatings));
+        setPicks(shuffle(items));
       } catch (loadError) {
         if (!ignore) setError(loadError);
       }

@@ -25,7 +25,7 @@ function Wishlist() {
     setStatus('loading');
     setError(null);
 
-    getWishlist(token)
+    getWishlist(token, { includeMemberRatings: true })
       .then((data) => {
         if (!mounted) return;
 
