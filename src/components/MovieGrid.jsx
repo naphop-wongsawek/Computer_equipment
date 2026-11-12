@@ -1,13 +1,13 @@
 import MovieCard from './MovieCard';
 
-// วาดรายการหนังตาม "สถานะ" 3 แบบ: loading | error | success (สำเร็จแต่ว่างเปล่าก็เป็น success)
+// วาดรายการอุปกรณ์ตาม "สถานะ" 3 แบบ: loading | error | success (สำเร็จแต่ว่างเปล่าก็เป็น success)
 function MovieGrid({ movies, status, error, onRetry }) {
   if (status === 'loading') {
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 8 }, (_, i) => (
           <div key={i} className="animate-pulse overflow-hidden rounded-xl border border-slate-200">
-            <div className="aspect-[2/3] bg-slate-100" />
+            <div className="aspect-square bg-slate-100" />
             <div className="space-y-2 p-3">
               <div className="h-4 w-3/4 rounded bg-slate-100" />
               <div className="h-3 w-1/2 rounded bg-slate-100" />
@@ -34,7 +34,7 @@ function MovieGrid({ movies, status, error, onRetry }) {
   }
 
   if (!movies || movies.length === 0) {
-    return <p className="py-16 text-center text-slate-400">ไม่พบหนังที่ค้นหา ลองคำอื่นดู</p>;
+    return <p className="py-16 text-center text-slate-400">ไม่พบอุปกรณ์ที่ค้นหา ลองคำอื่นดู</p>;
   }
 
   return (

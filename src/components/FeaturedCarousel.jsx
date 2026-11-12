@@ -9,7 +9,7 @@ function FeaturedCarousel({ movies }) {
   const total = Math.ceil(movies.length / PER_PAGE);   // จำนวนชุด เช่น 10 เรื่อง = 3 ชุด
 
   if (movies.length === 0) {
-    return <p className="py-10 text-center text-slate-400">ยังไม่มีหนังแนะนำ</p>;
+    return <p className="py-10 text-center text-slate-400">ยังไม่มีอุปกรณ์แนะนำ</p>
   }
 
   const shown = movies.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
