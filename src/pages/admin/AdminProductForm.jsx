@@ -77,7 +77,7 @@ function toPayload(form) {
   };
 }
 
-function AdminMovieForm() {
+function AdminProductForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const { token } = useAuth();
@@ -306,4 +306,4 @@ function AdminMovieForm() {
   );
 }
 
-export default AdminMovieForm;
+export default AdminProductForm;

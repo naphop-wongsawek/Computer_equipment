@@ -10,7 +10,7 @@ import {
 } from '../../components/admin/AdminStates';
 
 // ตารางแสดงอุปกรณ์คอมพิวเตอร์ทั้งหมดในระบบ
-function AdminMovies() {
+function AdminProducts() {
   const { token } = useAuth();
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -188,4 +188,4 @@ function AdminMovies() {
   );
 }
 
-export default AdminMovies;
+export default AdminProducts;

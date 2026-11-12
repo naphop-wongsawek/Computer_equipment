@@ -14,8 +14,8 @@ import Wishlist from './pages/Wishlist';
 import NotFound from './pages/NotFound';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminMovies from './pages/admin/AdminMovies';
-import AdminMovieForm from './pages/admin/AdminMovieForm';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminMembers from './pages/admin/AdminMembers';
 
 function App() {
@@ -36,9 +36,9 @@ function App() {
             {/* หลังบ้าน: ครอบทั้งกิ่งด้วย RequireRole ครั้งเดียว หน้าลูกทุกหน้าได้รับการป้องกันหมด */}
             <Route path="/admin" element={<RequireRole role="admin"><AdminLayout /></RequireRole>}>
               <Route index element={<AdminDashboard />} />
-              <Route path="products" element={<AdminMovies />} />
-              <Route path="products/new" element={<AdminMovieForm />} />
-              <Route path="products/:id" element={<AdminMovieForm />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="products/new" element={<AdminProductForm />} />
+              <Route path="products/:id" element={<AdminProductForm />} />
               <Route path="members" element={<AdminMembers />} />
             </Route>
             <Route path="/about" element={<About />} />
