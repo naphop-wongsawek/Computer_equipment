@@ -39,7 +39,9 @@ function ProductCard({ product }) {
 
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-emerald-50 pt-3">
           <span className="text-sm font-medium text-amber-600">
-            {product.rating != null ? `★ ${product.rating}` : 'ยังไม่มีคะแนน'}
+            {product.memberRating != null
+              ? `★ ${product.memberRating}${product.memberVoteCount != null ? ` (${product.memberVoteCount})` : ''}`
+              : product.rating != null ? `★ ${product.rating}` : 'ยังไม่มีคะแนน'}
           </span>
           <span className="text-sm font-bold text-emerald-900">
             {product.price != null ? `฿${Number(product.price).toLocaleString('th-TH')}` : 'สอบถามราคา'}

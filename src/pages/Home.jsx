@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FeaturedCarousel from '../components/FeaturedCarousel';
-import { getProducts } from '../api/backend';
+import { getProduct, getProducts } from '../api/backend';
 
 function shuffle(list) {
   const copy = [...list];
@@ -19,15 +19,30 @@ function Home() {
 
   useEffect(() => {
     let ignore = false;
-    getProducts()
-      .then(items => {
+    async function loadProducts() {
+      try {
+        const items = await getProducts();
         if (ignore) return;
         setProducts(items);
-        setPicks(shuffle(items));
-      })
-      .catch(loadError => {
+        const productsWithRatings = await Promise.all(
+          items.map(async item => {
+            const details = await getProduct(item.id);
+            return {
+              ...item,
+              memberRating: details.memberRating,
+              memberVoteCount: details.memberVoteCount,
+            };
+          })
+        );
+        if (ignore) return;
+        setProducts(productsWithRatings);
+        setPicks(shuffle(productsWithRatings));
+      } catch (loadError) {
         if (!ignore) setError(loadError);
-      });
+      }
+    }
+
+    loadProducts();
 
     return () => {
       ignore = true;
