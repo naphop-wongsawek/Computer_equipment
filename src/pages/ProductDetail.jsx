@@ -121,7 +121,7 @@ function ProductDetail() {
           </p>
 
           <p className="mt-2 text-sm text-slate-500">
-            เปิดตัวปี {product.releaseYear}
+            เปิดตัวปี {product.releaseYear ?? 'ไม่ระบุปี'}
             {product.rating != null && ` | ⭐ ${product.rating}`}
             {product.price != null &&
               ` | ราคาประมาณ ฿${product.price.toLocaleString('th-TH')}`}

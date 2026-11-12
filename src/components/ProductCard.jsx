@@ -36,6 +36,9 @@ function ProductCard({ product }) {
         <p className="mt-1 truncate text-sm text-slate-500">
           {product.brand || 'ไม่ระบุยี่ห้อ'}
         </p>
+        <p className="mt-1 text-xs text-slate-400">
+          ปีเปิดตัว: {product.releaseYear ?? 'ไม่ระบุปี'}
+        </p>
 
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-emerald-50 pt-3">
           <span className="text-sm font-medium text-amber-600">
